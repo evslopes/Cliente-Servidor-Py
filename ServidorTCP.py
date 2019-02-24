@@ -16,9 +16,12 @@ print("Conectado a:", str(addr))
 
 while True:
   # Recebe pedido do cliente:
-  msg = socket_cliente.recv(4)
-  if msg.decode('ascii') == 'fim':
-      break
+  msg = socket_cliente.recv(100)
+
+  # if msg.decode('ascii') == 'fim':
+  #     break
+  # O COMENTARIO ACIMA QUEBRA O WHILE INFINITO
+
   # Gera a lista de resposta
   resposta = []
   resposta.append(psutil.cpu_percent())
@@ -30,6 +33,3 @@ while True:
   # Envia os dados
   socket_cliente.send(bytes_resp)
 
-# Fecha socket do servidor e cliente
-socket_cliente.close()
-socket_servidor.close()
