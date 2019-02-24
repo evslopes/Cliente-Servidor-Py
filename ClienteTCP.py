@@ -22,6 +22,10 @@ while True:
               bytes = s.recv(1024)
               # Converte os bytes para lista
               lista = pickle.loads(bytes)
+              
+              # enviando dado único
+              print(lista)
+              
               imprime(lista)
               time.sleep(2)
           #msg = 'fim'
