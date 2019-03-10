@@ -1,4 +1,7 @@
-import socket, psutil, pickle
+import socket
+import psutil
+import pickle
+
 
 # Cria o socket
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -11,7 +14,7 @@ socket_servidor.bind((host, porta))
 socket_servidor.listen()
 print("Servidor de nome", host, "esperando conexão na porta", porta)
 # Aceita alguma conexão
-(socket_cliente,addr) = socket_servidor.accept()
+(socket_cliente, addr) = socket_servidor.accept()
 print("Conectado a:", str(addr))
 
 while True:
@@ -21,6 +24,23 @@ while True:
         break
 
     elif msg.decode('ascii') == '2':
+        resposta = []
+
+        # buscando memoria total
+        mem = psutil.virtual_memory()
+        total = round(mem.total/(1024*1024*1024), 2)
+        texto_total = "Memória Total: " + str(total) + "GB"
+        
+        # buscando memoria em uso
+        mem_a = psutil.virtual_memory()
+        available = round(mem.available/(1024*1024*1024), 2)
+        texto_available = "Memória em uso: " + str(total - available) + "GB"
+        
+        # calculando porcentagem de uso
+        porcentagem = (available/total)*100
+        texto_porcentagem = "% em uso: " + str(porcentagem) + "%"
+
+        resposta.append(texto_total + "  " + texto_available + "  " + texto_porcentagem)
 
         # Prepara a lista para o envio
         bytes_resp = pickle.dumps(resposta)
