@@ -58,10 +58,7 @@ while True:
 
     elif msg.decode('ascii') == '4':
         resposta = []
-        resposta.append(psutil.cpu_percent())
-        mem = psutil.virtual_memory()
-        mem_percent = mem.used/mem.total
-        resposta.append(mem_percent)
+        resposta.append(psutil.cpu_freq())
         # Prepara a lista para o envio
         bytes_resp = pickle.dumps(resposta)
         # Envia os dados
