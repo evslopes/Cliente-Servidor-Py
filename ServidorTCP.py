@@ -38,7 +38,7 @@ while True:
         
         # calculando porcentagem de uso
         porcentagem = 100-((available/total)*100)
-        texto_porcentagem = "% em uso: " + str(porcentagem) + "%"
+        texto_porcentagem = "--- " + str(porcentagem) + "%"
 
         resposta.append(texto_total + "  " + texto_available + "  " + texto_porcentagem)
 
@@ -66,5 +66,7 @@ while True:
 
 
 # Fecha socket do servidor e cliente
+print("Fechando conexão...")
 socket_cliente.close()
 socket_servidor.close()
+print("Aplicação finalizada.")
