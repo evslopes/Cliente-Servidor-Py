@@ -48,7 +48,8 @@ try:
     s.send(msg.encode('ascii'))
 
 except Exception as erro:
-    print(str(erro))
+    ### Tratar esse erro criando uma funcao com o cógido acima
+    print("A aplicação aprensentou erro: " + str(erro) + ", aplicação finalizada.")
 
 # Fecha o socket
 s.close()
