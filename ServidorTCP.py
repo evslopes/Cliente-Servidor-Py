@@ -37,7 +37,7 @@ while True:
         texto_available = "Memória em uso: " + str(total - available) + "GB"
         
         # calculando porcentagem de uso
-        porcentagem = (available/total)*100
+        porcentagem = 100-((available/total)*100)
         texto_porcentagem = "% em uso: " + str(porcentagem) + "%"
 
         resposta.append(texto_total + "  " + texto_available + "  " + texto_porcentagem)
