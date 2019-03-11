@@ -40,6 +40,16 @@ def uso_memoria():
 
     return resposta
 
+# Função para coletar informações sobre a rede
+def info_redes():
+    
+    resposta = []
+
+    dic_interfaces = psutil.net_if_addrs()
+    texto = "Interface de rede: " + str(dic_interfaces) + "."
+    
+    resposta.append(texto)
+    return resposta
 
 # ___main___
 
@@ -49,6 +59,7 @@ while True:
     if msg.decode('ascii') == 'fim':
         break
 
+    # Uso da memória
     elif msg.decode('ascii') == '2':
 
         # Prepara a lista para o envio
@@ -72,6 +83,15 @@ while True:
         bytes_resp = pickle.dumps(resposta)
         # Envia os dados
         socket_cliente.send(bytes_resp)
+
+    # Uso da rede
+    elif msg.decode('ascii') == '5':
+
+        # Prepara a lista para o envio
+        bytes_resp = pickle.dumps(info_redes())
+        # Envia os dados
+        socket_cliente.send(bytes_resp)
+
 
 
 # Fecha socket do servidor e cliente
