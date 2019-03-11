@@ -17,6 +17,32 @@ print("Servidor de nome", host, "esperando conexão na porta", porta)
 (socket_cliente, addr) = socket_servidor.accept()
 print("Conectado a:", str(addr))
 
+# Função para verificar memoria total, em uso e porcentagem
+def uso_memoria():
+    resposta = []
+
+    # buscando memoria total
+    mem = psutil.virtual_memory()
+    total = round(mem.total/(1024*1024*1024), 2)
+    texto_total = "Memória Total: " + str(total) + "GB"
+
+    # buscando memoria em uso
+    mem_a = psutil.virtual_memory()
+    available = round(mem.available/(1024*1024*1024), 2)
+    texto_available = "Memória em uso: " + str(total - available) + "GB"
+
+    # calculando porcentagem de uso
+    porcentagem = 100-((available/total)*100)
+    texto_porcentagem = "--- " + str(porcentagem) + "%"
+
+    resposta.append(texto_total + "  " + texto_available +
+                    "  " + texto_porcentagem)
+
+    return resposta
+
+
+# ___main___
+
 while True:
     # Recebe pedido do cliente:
     msg = socket_cliente.recv(1024)
@@ -24,26 +50,9 @@ while True:
         break
 
     elif msg.decode('ascii') == '2':
-        resposta = []
-
-        # buscando memoria total
-        mem = psutil.virtual_memory()
-        total = round(mem.total/(1024*1024*1024), 2)
-        texto_total = "Memória Total: " + str(total) + "GB"
-        
-        # buscando memoria em uso
-        mem_a = psutil.virtual_memory()
-        available = round(mem.available/(1024*1024*1024), 2)
-        texto_available = "Memória em uso: " + str(total - available) + "GB"
-        
-        # calculando porcentagem de uso
-        porcentagem = 100-((available/total)*100)
-        texto_porcentagem = "--- " + str(porcentagem) + "%"
-
-        resposta.append(texto_total + "  " + texto_available + "  " + texto_porcentagem)
 
         # Prepara a lista para o envio
-        bytes_resp = pickle.dumps(resposta)
+        bytes_resp = pickle.dumps(uso_memoria())
         # Envia os dados
         socket_cliente.send(bytes_resp)
 
