@@ -2,21 +2,6 @@ import socket
 import psutil
 import pickle
 
-
-# Cria o socket
-socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Obtem o nome da máquina
-host = socket.gethostname()
-porta = 9999
-# Associa a porta
-socket_servidor.bind((host, porta))
-# Escutando...
-socket_servidor.listen()
-print("Servidor de nome", host, "esperando conexão na porta", porta)
-# Aceita alguma conexão
-(socket_cliente, addr) = socket_servidor.accept()
-print("Conectado a:", str(addr))
-
 # Função para verificar memoria total, em uso e porcentagem
 def uso_memoria():
     resposta = []
@@ -45,11 +30,25 @@ def info_redes():
     
     resposta = []
 
-    dic_interfaces = psutil.net_if_addrs()
+    dic_interfaces = psutil.net_if_addrs('lo')
     texto = "Interface de rede: " + str(dic_interfaces) + "."
     
     resposta.append(texto)
     return resposta
+
+# Cria o socket
+socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Obtem o nome da máquina
+host = socket.gethostname()
+porta = 9999
+# Associa a porta
+socket_servidor.bind((host, porta))
+# Escutando...
+socket_servidor.listen()
+print("Servidor de nome", host, "esperando conexão na porta", porta)
+# Aceita alguma conexão
+(socket_cliente, addr) = socket_servidor.accept()
+print("Conectado a:", str(addr))
 
 # ___main___
 
