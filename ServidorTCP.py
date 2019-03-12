@@ -1,12 +1,8 @@
-import socket, psutil, pickle, os, os.path
-from datetime import datetime
+import socket, psutil, pickle
 
-print("Nome do dispositivo:", os.getenv("SystemDrive"))
-print("Formato: ", psutil.disk_partitions(os.getenv("SystemDrive"))[0][2])
-print("Total: ", round(psutil.disk_usage(os.getenv("SystemDrive")).total/1024**3, 2), "GB")
-print("Disponível: ", round(psutil.disk_usage(os.getenv("SystemDrive")).free/1024**3, 2), "GB")
-print(datetime.fromtimestamp(os.stat(os.getenv("SystemDrive")).st_mtime))
-print(datetime.fromtimestamp(os.stat(os.getenv("SystemDrive")).st_ctime))
+def cpu():
+  resposta = ['Frequência atual: ', psutil.cpu_freq().current,'Frequência max: ',  psutil.cpu_freq().max, 'Porcentagem por CPU: ', psutil.cpu_percent(percpu=True), 'Porcentagem total: ', psutil.cpu_percent()]
+  return resposta
 
 # Cria o socket
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -23,27 +19,44 @@ print("Servidor de nome", host, "esperando conexão na porta", porta)
 print("Conectado a:", str(addr))
 
 while True:
-  # Recebe pedido do cliente:
-  msg = socket_cliente.recv(100)
-  nomeDiretorio = os.getenv("SystemDrive")
-  tipoDiretorio = psutil.disk_partitions(os.getenv("SystemDrive"))[0][2]
-  tamanhoDiretorio = round(psutil.disk_usage(os.getenv("SystemDrive")).total/1024**3, 2), "GB"
-  disponivelDiretorio = round(psutil.disk_usage(os.getenv("SystemDrive")).free/1024**3, 2), "GB"
-  # localizacaoDiretorio =
-  dataCriacaoDiretorio = datetime.fromtimestamp(os.stat(os.getenv("SystemDrive")).st_mtime)
-  dataModificacaoDiretorio = datetime.fromtimestamp(os.stat(os.getenv("SystemDrive")).st_ctime)
+    # Recebe pedido do cliente:
+    msg = socket_cliente.recv(1024)
+    if msg.decode('ascii') == 'fim':
+        break
 
-  # if msg.decode('ascii') == 'fim':
-  #     break
-  # O COMENTARIO ACIMA QUEBRA O WHILE INFINITO // decode encode usar quando for algo mto especifico
+    # Uso da memória
+    elif msg.decode('ascii') == '2':
 
-  # Gera a lista de resposta
-  resposta = []
-  resposta.append(psutil.cpu_percent())
-  mem = psutil.virtual_memory()
-  mem_percent = mem.used/mem.total
-  resposta.append(mem_percent)
-  # Prepara a lista para o envio
-  bytes_resp = pickle.dumps(nomeDiretorio)
-  # Envia os dados
-  socket_cliente.send(bytes_resp)
+        bytes_resp = pickle.dumps()
+        # Envia os dados
+        socket_cliente.send(bytes_resp)
+
+    elif msg.decode('ascii') == '3':
+        resposta = []
+        resposta.append(psutil.disk_partitions())
+
+        # Prepara a lista para o envio
+        bytes_resp = pickle.dumps(resposta)
+        # Envia os dados
+        socket_cliente.send(bytes_resp)
+
+    elif msg.decode('ascii') == '4':
+        resposta = []
+        resposta.append(cpu())
+        # Prepara a lista para o envio
+        bytes_resp = pickle.dumps(resposta)
+        # Envia os dados
+        socket_cliente.send(bytes_resp)
+
+    # Uso da rede
+    elif msg.decode('ascii') == '5':
+        # Prepara a lista para o envio
+        bytes_resp = pickle.dumps()
+        # Envia os dados
+        socket_cliente.send(bytes_resp)
+
+# Fecha socket do servidor e cliente
+print("Fechando conexão...")
+socket_cliente.close()
+socket_servidor.close()
+print("Aplicação finalizada.")
