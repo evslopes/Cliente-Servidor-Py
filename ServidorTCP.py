@@ -77,7 +77,7 @@ while True:
 
     elif msg.decode('ascii') == '4':
         resposta = []
-        resposta.append(psutil.cpu_freq())
+        resposta.append(cpu())
         # Prepara a lista para o envio
         bytes_resp = pickle.dumps(resposta)
         # Envia os dados

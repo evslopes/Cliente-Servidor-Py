@@ -17,7 +17,6 @@ def menu_cliente():
           "\t [FIM] Para sair \n"
           )
 
-
 menu_cliente()
 a = input("Digite o número da informação que deseja saber: ")
 
