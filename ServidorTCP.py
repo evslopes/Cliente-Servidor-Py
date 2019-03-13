@@ -2,6 +2,11 @@ import socket
 import psutil
 import pickle
 
+# F\unção para exibir uso do CPU
+def cpu():
+  resposta = ['Frequência atual: ', psutil.cpu_freq().current,'Frequência max: ',  psutil.cpu_freq().max, 'Porcentagem por CPU: ', psutil.cpu_percent(percpu=True), 'Porcentagem total: ', psutil.cpu_percent()]
+  return resposta
+
 # Função para verificar memoria total, em uso e porcentagem
 def uso_memoria():
     resposta = []
