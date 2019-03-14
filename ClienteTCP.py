@@ -24,15 +24,15 @@ try:
     while(a != 'FIM'):
         msg = str(a)
         print('{:>8}'.format('')+'{:>8}'.format(''))
-        for i in range(10):
+        while True:
             # Envia mensagem vazia apenas para indicar a requisição
             s.send(msg.encode('ascii'))
             bytes = s.recv(6000)
 
             # Converte os bytes para lista
             lista = pickle.loads(bytes)
-            print(lista)
-            time.sleep(2)
+            print('\r', lista, end='')
+
         a = input("\nDigite o número da informação que deseja saber: ")
 
     msg = 'fim'
