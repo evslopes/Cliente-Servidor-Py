@@ -1,35 +1,37 @@
 import socket, psutil, pickle, cpuinfo
 
-
-print(cpuinfo.get_cpu_info()['brand'])
-
-# Funções para coleta de informação do processador ---------------------------------------------------------------------
+# Funções
 def info_cpu():
-  resposta = 'Nome do processador: ', cpuinfo.get_cpu_info()['brand'], '\nArquitetura do processador: ', cpuinfo.get_cpu_info()['arch'], '\nBits do processador: ', cpuinfo.get_cpu_info()['bits'], '\nNúmero de processadores lógicos: ', psutil.cpu_count(logical=True), '\nNúmero de processadores físicos: ', psutil.cpu_count(logical=False), '\nFrequência atual: ', psutil.cpu_freq().current, 'Frequência max: ',  psutil.cpu_freq().max, '\nPorcentagem por CPU: ', psutil.cpu_percent(percpu=True), '\nPorcentagem total: ', psutil.cpu_percent()
+
+  resposta = {"cpu_nome": cpuinfo.get_cpu_info()['brand'],
+              "cpu_arq": cpuinfo.get_cpu_info()['arch'],
+              "cpu_bits": cpuinfo.get_cpu_info()['bits'],
+              "cpu_logico": psutil.cpu_count(logical=True),
+              "cpu_fisico": psutil.cpu_count(logical=False),
+              "cpu_frequencia_atual": psutil.cpu_freq().current,
+              "cpu_frequencia_max":  psutil.cpu_freq().max,
+              "cpu_percentual_nucleo": psutil.cpu_percent(percpu=True),
+              "cpu_percentual": psutil.cpu_percent()}
+
   return resposta
 
 def uso_memoria():
-    resposta = []
 
     # buscando memoria total
     mem = psutil.virtual_memory()
     total = round(mem.total/(1024*1024*1024), 2)
-    texto_total = "Memória Total: " + str(total) + "GB"
 
     # buscando memoria em uso
-    mem_a = psutil.virtual_memory()
     available = round(mem.available/(1024*1024*1024), 2)
-    texto_available = "Memória em uso: " + str(total - available) + "GB"
 
     # calculando porcentagem de uso
     porcentagem = 100-((available/total)*100)
-    texto_porcentagem = "--- " + str(porcentagem) + "%"
 
-    resposta.append(texto_total + "  " + texto_available +
-                    "  " + texto_porcentagem)
+    resposta = {"ram_total": total,
+                "ram_uso": available,
+                "ram_percentual": porcentagem}
 
     return resposta
-
 
 def info_redes():
     resposta = []
@@ -41,8 +43,23 @@ def info_redes():
     return resposta
 
 def info_processos():
+    print()
+    # pids = psutil.pids()
+    # pids_nome = []
+    # pids_cpu = []
 
-    return resposta
+    # for x in pids:
+    #     pids_nome.append(psutil.Process(x).name())
+    #     pids_cpu.append(psutil.Process(x).cpu_percent())
+
+    # lista = [pids, pids_nome, pids_cpu]
+
+    # for x in range(len(pids)):
+    #     print(pids[x], pids_nome[x], pids_cpu[x])
+
+    # resposta = {lista}
+
+    # return resposta
 
 def info_disco():
 
