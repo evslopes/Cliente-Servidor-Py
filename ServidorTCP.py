@@ -2,10 +2,12 @@ import socket
 import psutil
 import pickle
 
-# F\unção para exibir uso do CPU
+# Função para exibir uso do CPU
 def cpu():
-  resposta = ['Frequência atual: ', psutil.cpu_freq().current,'Frequência max: ',  psutil.cpu_freq().max, 'Porcentagem por CPU: ', psutil.cpu_percent(percpu=True), 'Porcentagem total: ', psutil.cpu_percent()]
-  return resposta
+    resposta = ['Frequência atual: ', psutil.cpu_freq().current, 'Frequência max: ',  psutil.cpu_freq(
+    ).max, 'Porcentagem por CPU: ', psutil.cpu_percent(percpu=True), 'Porcentagem total: ', psutil.cpu_percent()]
+    return resposta
+
 
 # Função para verificar memoria total, em uso e porcentagem
 def uso_memoria():
@@ -30,16 +32,19 @@ def uso_memoria():
 
     return resposta
 
+
 # Função para coletar informações sobre a rede
 def info_redes():
     
+    interfaces = psutil.net_if_addrs()
     resposta = []
 
-    dic_interfaces = psutil.net_if_addrs('lo')
-    texto = "Interface de rede: " + str(dic_interfaces) + "."
-    
-    resposta.append(texto)
+    resposta.append(str(interfaces))
+
+    resposta = list(set(resposta))
+
     return resposta
+
 
 # Cria o socket
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -94,8 +99,7 @@ while True:
         # Prepara a lista para o envio
         bytes_resp = pickle.dumps(info_redes())
         # Envia os dados
-        socket_cliente.send(bytes_resp)
-
+        socket_cliente.send(bytes_resp)   
 
 
 # Fecha socket do servidor e cliente

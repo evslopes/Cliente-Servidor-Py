@@ -17,6 +17,8 @@ def menu_cliente():
           "\t [FIM] Para sair \n"
           )
 
+
+# ___main___
 menu_cliente()
 a = input("Digite o número da informação que deseja saber: ")
 
@@ -28,13 +30,13 @@ try:
     s.connect((socket.gethostname(), 9999))
 
     # Loop
-    while(a != 'FIM'):
+    while(a != 'FIM'): 
         msg = str(a)
         print('{:>8}'.format('')+'{:>8}'.format(''))
         for i in range(10):
             # Envia mensagem vazia apenas para indicar a requisição
             s.send(msg.encode('ascii'))
-            bytes = s.recv(6000)
+            bytes = s.recv(6000)   
 
             # Converte os bytes para lista
             lista = pickle.loads(bytes)
