@@ -82,30 +82,30 @@ while True:
     # Recebimento da posição do menu
     bytes_menu = socket_cliente.recv(10240)
     menu = pickle.loads(bytes_menu)
-
+    print(menu)
     # Fechar
-    if menu[0] == 0:
+    if menu == 0:
         break
 
     # CPU
-    elif menu[0] == 1:
+    elif menu == 1:
         resposta = []
-        resposta.append(info_memoria())
+        resposta.append(info_cpu())
         bytes_resp = pickle.dumps(resposta)
         # Envia os dados
         socket_cliente.send(bytes_resp)
 
     # RAM
-    elif menu[0] == 2:
+    elif menu == 2:
         resposta = []
-        resposta.append(info_cpu())
+        resposta.append(info_memoria())
         # Prepara a lista para o envio
         bytes_resp = pickle.dumps(resposta)
         # Envia os dados
         socket_cliente.send(bytes_resp)
 
     # DISCO
-    elif menu[0] == 3:
+    elif menu == 3:
         resposta = []
         resposta.append(psutil.disk_partitions())
 
@@ -115,16 +115,16 @@ while True:
         socket_cliente.send(bytes_resp)
 
     # DIRETORIO
-    elif menu[0] == 4:
+    elif menu == 4:
         resposta = []
-        resposta.append(info_cpu())
+        resposta.append(info_disco())
         # Prepara a lista para o envio
         bytes_resp = pickle.dumps(resposta)
         # Envia os dados
         socket_cliente.send(bytes_resp)
 
     # PROCESSOS
-    elif menu[0] == 5:
+    elif menu == 5:
         # Cria a variavel de resposta
         resposta = []
 
@@ -147,11 +147,6 @@ while True:
         else:
             erro_pid = "PID Inválido."
             socket_cliente.send(pickle.dumps(erro_pid))
-
-
-        # Recebe os dados para o menu interno
-        bytes_menu = socket_cliente.recv(10240)
-        menu = pickle.loads(bytes_menu)
 
 
 # Fecha socket do servidor e cliente

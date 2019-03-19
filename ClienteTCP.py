@@ -15,14 +15,8 @@ def menu_cliente():
 # Execução da função do menu
 menu_cliente()
 
-# Criação do array para salvar as opções escolhidas no menu
-menu = []
-
 # Opção do menu escolhida
 a = int(input("Digite o número da informação que deseja saber: "))
-
-# Adição da Adição da opção escolhida no array
-menu.append(a)
 
 # Cria o socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -32,9 +26,9 @@ try:
     s.connect((socket.gethostname(), 9999))
 
     # Loop do menu
-    while(menu[0] != 0):
+    while(a != 0):
         # Requisição da posição do menu
-        bytes_menu = pickle.dumps(menu)
+        bytes_menu = pickle.dumps(a)
         s.send(bytes_menu)
 
         # Converte os bytes para lista
@@ -43,7 +37,7 @@ try:
         print('\r', lista, end='')
 
         # Menu interno
-        if menu[0] == 5:
+        if a == 5:
 
             pid = int(input("\nDigite o PID: "))
             bytes_menu = pickle.dumps(pid)
@@ -55,10 +49,6 @@ try:
             print(reposta2)
 
         a = int(input("\nDigite o número da informação que deseja saber: "))
-        del menu[0]
-        menu.insert(0, a)
-        bytes_menu = pickle.dumps(menu)
-        s.send(bytes_menu)
 
 except Exception as erro:
     # Tratar esse erro criando uma funcao com o cógido acima
