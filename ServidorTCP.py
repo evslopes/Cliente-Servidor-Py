@@ -62,6 +62,8 @@ def info_processos():
     # return resposta
 
 def info_disco():
+    resposta = []
+    resposta.append(psutil.disk_usage('/'))
 
     return resposta
 
@@ -94,11 +96,9 @@ while True:
         socket_cliente.send(bytes_resp)
 
     elif msg.decode('ascii') == '3':
-        resposta = []
-        resposta.append(psutil.disk_partitions())
 
         # Prepara a lista para o envio
-        bytes_resp = pickle.dumps(resposta)
+        bytes_resp = pickle.dumps(info_disco())
         # Envia os dados
         socket_cliente.send(bytes_resp)
 
