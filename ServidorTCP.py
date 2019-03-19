@@ -1,4 +1,4 @@
-import socket, psutil, pickle, cpuinfo
+import socket, psutil, pickle, cpuinfo, os
 
 # Funções
 def info_cpu():
@@ -11,7 +11,8 @@ def info_cpu():
               "cpu_frequencia_atual": psutil.cpu_freq().current,
               "cpu_frequencia_max":  psutil.cpu_freq().max,
               "cpu_percentual_nucleo": psutil.cpu_percent(percpu=True),
-              "cpu_percentual": psutil.cpu_percent()}
+              "cpu_percentual": psutil.cpu_percent()
+              }
 
   return resposta
 
@@ -65,8 +66,17 @@ def info_disco():
     resposta = []
     resposta.append(psutil.disk_usage('/'))
 
-    return resposta
+    lista = os.listdir()
 
+    dic = {}
+    for i in lista:
+        if os.path.isfile(i):
+            dic[i] = []
+            dic[i].append(os.stat(i).st_size)
+            dic[i].append(os.stat(i).st_atime)
+            dic[i].append(os.stat(i).st_mtime)
+
+    return resposta, dic
 
 # Cria o socket
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
