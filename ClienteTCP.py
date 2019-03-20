@@ -34,6 +34,7 @@ try:
 
         # Menu interno
         if a == 5:
+            print('\nInformações de processos:', '\n')
 
             # Converte os bytes para lista
             bytes = s.recv(10240)
