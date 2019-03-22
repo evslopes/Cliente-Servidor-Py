@@ -69,15 +69,9 @@ try:
             bytes = s.recv(10240)
             lista = pickle.loads(bytes)
 
-            print("Total:", lista[0][0], "")
-            print("Em uso:", lista[0][1], "")
-            print("Livre:", lista[0][2], "")
-
-            """
-            print("Total:", round(disco.total/(1024*1024*1024), 2), "GB")
-            print("Em uso:", round(disco.used/(1024*1024*1024), 2), "GB")
-            print("Livre:", round(disco.free/(1024*1024*1024), 2), "GB")
-            """
+            print("Total:", round(lista[0][0]/(1024*1024*1024), 2), "GB")
+            print("Em uso:", round(lista[0][1]/(1024*1024*1024), 2), "GB")
+            print("Livre:", round(lista[0][2]/(1024*1024*1024), 2), "GB")
 
             print("Percentual de Disco Usado:", lista[0][3])
 
