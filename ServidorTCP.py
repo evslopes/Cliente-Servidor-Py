@@ -102,7 +102,7 @@ while True:
     # Recebimento da posição do menu
     bytes_menu = socket_cliente.recv(10240)
     menu = pickle.loads(bytes_menu)
-    print(menu)
+
     # Fechar
     if menu == 0:
         break
