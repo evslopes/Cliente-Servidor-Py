@@ -73,9 +73,6 @@ try:
                   '\nBits: ', lista[0]['cpu_bits'],
                   '\n\nFrequência atual: ', lista[0]['cpu_frequencia_atual'], '/ Frequência máxima: ', lista[0]['cpu_frequencia_max'],
                   '\n\nPercentual de uso por núcleo: ', lista[0]['cpu_percentual_nucleo'], '/ Percentual de uso total: ', lista[0]['cpu_percentual'])
-        elif a == 3:
-            bytes = s.recv(10240)
-            lista = pickle.loads(bytes)
         elif a == 2:
             bytes = s.recv(10240)
             lista = pickle.loads(bytes)
@@ -86,6 +83,15 @@ try:
             print('Percentual:', lista[0]['ram_percentual'], '%')
 
 
+            print("Total:", round(lista[0][0]/(1024*1024*1024), 2), "GB")
+            print("Em uso:", round(lista[0][1]/(1024*1024*1024), 2), "GB")
+            print("Livre:", round(lista[0][2]/(1024*1024*1024), 2), "GB")
+
+            print("Percentual de Disco Usado:", lista[0][3], "%")
+
+        elif a == 3:
+            bytes = s.recv(10240)
+            lista = pickle.loads(bytes)
             print("Total:", round(lista[0][0]/(1024*1024*1024), 2), "GB")
             print("Em uso:", round(lista[0][1]/(1024*1024*1024), 2), "GB")
             print("Livre:", round(lista[0][2]/(1024*1024*1024), 2), "GB")
