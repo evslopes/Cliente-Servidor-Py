@@ -1,0 +1,88 @@
+html, body {
+    height: 100vh;
+    margin: 0;
+    font-family: 'Ubuntu', sans-serif;
+    background-color: #F4F8FA;
+    color:white;
+}
+
+header, main, footer {
+    padding-left: 78px;
+    
+}
+
+main{
+    height: calc(100vh - 64px);
+}
+
+.material-tooltip{
+    background: #11998e;
+}
+
+#sidenav-1{
+    background: linear-gradient(to bottom, #11998e, #38ef7d); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */  
+    font-style: white;
+}
+
+nav{
+    background-color:#232C3D !important;
+}
+
+.sidenav li>a {
+    color: rgba(0,0,0,0.87);
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    height: initial;
+    line-height: initial;
+    padding: 0 !important;
+}
+
+li{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    /* line-height: 51px; */
+    height: 60px;
+}
+
+.sidenav li>a.btn{
+    margin: 0px !important;
+}
+
+.display-flex{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 64px; 
+    height: 100%;
+}
+
+@media only screen and (max-width : 992px) {
+    header, main, footer {
+        padding-left: 0;
+    }
+}
+
+.jCProgress {
+    position: absolute;
+    z-index: 9999999;
+    /*  margin-top:-15px; /* offset from the center */
+}
+
+.jCProgress > div.percent {
+    font: 18px/27px 'BebasRegular', Arial, sans-serif;
+    color:#ebebeb;
+    text-shadow: 1px 1px 1px #1f1f1f;
+
+    position:absolute;
+    margin-top:40px;
+    margin-left:22px;
+    text-align: center;
+    width:60px;
+}
+
+
