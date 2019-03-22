@@ -64,17 +64,21 @@ def info_disco():
     resposta = []
     resposta.append(psutil.disk_usage('/'))
 
+    return resposta
+
+def info_diretorio():
+
+    resposta = {}
     lista = os.listdir()
 
-    dic = {}
     for i in lista:
         if os.path.isfile(i):
-            dic[i] = []
-            dic[i].append(os.stat(i).st_size)
-            dic[i].append(os.stat(i).st_atime)
-            dic[i].append(os.stat(i).st_mtime)
+            resposta[i] = []
+            resposta[i].append(os.stat(i).st_size)
+            resposta[i].append(os.stat(i).st_atime)
+            resposta[i].append(os.stat(i).st_mtime)
 
-    return resposta, dic
+    return resposta
 
 # Cria o socket
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -119,8 +123,6 @@ while True:
 
     # DISCO
     elif menu == 3:
-        resposta = []
-        resposta.append(psutil.disk_partitions())
 
         # Prepara a lista para o envio
         bytes_resp = pickle.dumps(info_disco())
@@ -129,10 +131,9 @@ while True:
 
     # DIRETORIO
     elif menu == 4:
-        resposta = []
-        resposta.append(info_disco())
+
         # Prepara a lista para o envio
-        bytes_resp = pickle.dumps(resposta)
+        bytes_resp = pickle.dumps(info_diretorio())
         # Envia os dados
         socket_cliente.send(bytes_resp)
 
