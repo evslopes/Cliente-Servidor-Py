@@ -95,6 +95,7 @@ try:
             print("Total:", round(lista[0][0]/(1024*1024*1024), 2), "GB")
             print("Em uso:", round(lista[0][1]/(1024*1024*1024), 2), "GB")
             print("Livre:", round(lista[0][2]/(1024*1024*1024), 2), "GB")
+            print("Arquitetutra:", lista[1])
 
             print("Percentual de Disco Usado:", lista[0][3], "%")
 

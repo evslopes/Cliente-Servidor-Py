@@ -65,6 +65,7 @@ def info_processos():
 def info_disco():
     resposta = []
     resposta.append(psutil.disk_usage('/'))
+    resposta.append(psutil.disk_partitions('/')[0][2])
 
     return resposta
 
