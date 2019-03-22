@@ -4,11 +4,12 @@ import socket, time, pickle
 def menu_cliente():
 
     print("\nDigite a seguinte tecla para ter informações do servidor:\n\n"
-          "\t [1]   Informações do  Processador \n"
-          "\t [2]   Informações da  Memória \n"
-          "\t [3]   Informações do  Disco \n"
-          "\t [4]   Informações do  Diretório \n"
-          "\t [5]   Informações dos Processos \n"
+          "\t [1]   Informações do Processador \n"
+          "\t [2]   Informações da Memória \n"
+          "\t [3]   Informações do Disco \n"
+          "\t [4]   Informações do Diretório \n"
+          "\t [5]   Informações de Processo \n"
+          "\t [6]   Informações da Rede \n"
           "\t [0]   Para sair \n"
           )
 
@@ -39,17 +40,24 @@ try:
             # Converte os bytes para lista
             bytes = s.recv(10240)
             lista = pickle.loads(bytes)
+
+            print('{:^5}'.format("PIDs"), '{:^10}'.format("RAM em MB"), "Executavel")
             for x in range(len(lista[0]['pids'])):
-                print(lista[0]['pids'][x], lista[0]['pids_nome'][x], lista[0]['pids_memory'][x])
+                print("{:^5}".format(lista[0]['pids'][x]), "{:^10}".format(lista[0]['pids_memory'][x]), lista[0]['pids_nome'][x])
 
             pid = int(input("\nDigite o PID: "))
             bytes_menu = pickle.dumps(pid)
             s.send(bytes_menu)
             bytes_menu = s.recv(10240)
 
+
             reposta2 = pickle.loads(bytes_menu)
 
-            print(reposta2)
+            if reposta2 == "PID Inválido.":
+                print("\nPID Inválido")
+            else:
+                print('\nNúcleos por PID: ', round(float(reposta2)/100))
+
         elif a == 1:
             # Converte os bytes para lista
             bytes = s.recv(10240)
@@ -63,6 +71,15 @@ try:
                   '\nBits: ', lista[0]['cpu_bits'],
                   '\n\nFrequência atual: ', lista[0]['cpu_frequencia_atual'], '/ Frequência máxima: ', lista[0]['cpu_frequencia_max'],
                   '\n\nPercentual de uso por núcleo: ', lista[0]['cpu_percentual_nucleo'], '/ Percentual de uso total: ', lista[0]['cpu_percentual'])
+        elif a == 2:
+            bytes = s.recv(10240)
+            lista = pickle.loads(bytes)
+
+            print('\nInformações da memória\n')
+            print('Atual: ', lista[0]['ram_uso'], 'GB')
+            print('Total: ', lista[0]['ram_total'], 'GB')
+            print('Percentual:', lista[0]['ram_percentual'], '%')
+
 
         else:
 
