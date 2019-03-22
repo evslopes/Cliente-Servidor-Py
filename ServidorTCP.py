@@ -34,13 +34,12 @@ def info_memoria():
     return resposta
 
 def info_redes():
-    resposta = []
+    
+    resposta = {"lo0": psutil.net_if_addrs()['lo0'],
+              }
 
-    dic_interfaces = psutil.net_if_addrs('lo')
-    texto = "Interface de rede: " + str(dic_interfaces) + "."
-
-    resposta.append(texto)
     return resposta
+
 
 def info_processos():
     pids = psutil.pids()
@@ -150,7 +149,15 @@ while True:
         else:
             erro_pid = "PID Inválido."
             socket_cliente.send(pickle.dumps(erro_pid))
-
+    
+    # REDE
+    elif menu == 6:
+        resposta = []
+        resposta.append(info_redes())
+        # Prepara a lista para o envio
+        bytes_resp = pickle.dumps(resposta)
+        # Envia os dados
+        socket_cliente.send(bytes_resp)
 
 # Fecha socket do servidor e cliente
 print("Fechando conexão...")
