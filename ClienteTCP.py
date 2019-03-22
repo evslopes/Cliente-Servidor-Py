@@ -25,7 +25,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
     # Tenta se conectar ao servidor
-    s.connect((socket.gethostname(), 9999))
+    s.connect((socket.gethostname(), 9991))
 
     # Loop do menu
     while(a != 0):
@@ -65,6 +65,22 @@ try:
                   '\nBits: ', lista[0]['cpu_bits'],
                   '\n\nFrequência atual: ', lista[0]['cpu_frequencia_atual'], '/ Frequência máxima: ', lista[0]['cpu_frequencia_max'],
                   '\n\nPercentual de uso por núcleo: ', lista[0]['cpu_percentual_nucleo'], '/ Percentual de uso total: ', lista[0]['cpu_percentual'])
+        elif a == 3:
+            bytes = s.recv(10240)
+            lista = pickle.loads(bytes)
+
+            print("Total:", lista[0][0], "")
+            print("Em uso:", lista[0][1], "")
+            print("Livre:", lista[0][2], "")
+
+            """
+            print("Total:", round(disco.total/(1024*1024*1024), 2), "GB")
+            print("Em uso:", round(disco.used/(1024*1024*1024), 2), "GB")
+            print("Livre:", round(disco.free/(1024*1024*1024), 2), "GB")
+            """
+
+            print("Percentual de Disco Usado:", lista[0][3])
+
 
         else:
 

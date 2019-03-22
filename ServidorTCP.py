@@ -86,7 +86,7 @@ def info_diretorio():
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Obtem o nome da máquina
 host = socket.gethostname()
-porta = 9999
+porta = 9991
 # Associa a porta
 socket_servidor.bind((host, porta))
 # Escutando...
