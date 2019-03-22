@@ -1,3 +1,5 @@
+#Nome dos alunos: Mayara Lima, Elvis Lopes, Antônio Castillo
+
 import socket, time, pickle
 
 # Função do menu
