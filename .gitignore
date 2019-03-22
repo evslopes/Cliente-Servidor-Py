@@ -1,3 +1,7 @@
 
 *.xml
+<<<<<<< refs/remotes/origin/patch-1
+.idea/Projeto_Python_2019_1.iml
+=======
 *.iml
+>>>>>>> Create .gitignore

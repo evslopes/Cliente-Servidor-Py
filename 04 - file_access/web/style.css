@@ -3,7 +3,7 @@ html, body {
     margin: 0;
     font-family: 'Ubuntu', sans-serif;
     background-color: #F4F8FA;
-    color:white;
+    color: #000000 !important;
 }
 
 header, main, footer {
