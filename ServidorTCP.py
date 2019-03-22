@@ -77,8 +77,9 @@ def info_diretorio():
         if os.path.isfile(i):
             resposta[i] = []
             resposta[i].append(os.stat(i).st_size)
-            resposta[i].append(os.stat(i).st_atime)
+            resposta[i].append(os.stat(i).st_ctime)
             resposta[i].append(os.stat(i).st_mtime)
+
 
     return resposta
 
@@ -86,7 +87,7 @@ def info_diretorio():
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Obtem o nome da máquina
 host = socket.gethostname()
-porta = 9991
+porta = 9999
 # Associa a porta
 socket_servidor.bind((host, porta))
 # Escutando...

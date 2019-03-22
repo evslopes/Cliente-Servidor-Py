@@ -25,7 +25,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
     # Tenta se conectar ao servidor
-    s.connect((socket.gethostname(), 9991))
+    s.connect((socket.gethostname(), 9999))
 
     # Loop do menu
     while(a != 0):
@@ -73,7 +73,27 @@ try:
             print("Em uso:", round(lista[0][1]/(1024*1024*1024), 2), "GB")
             print("Livre:", round(lista[0][2]/(1024*1024*1024), 2), "GB")
 
-            print("Percentual de Disco Usado:", lista[0][3])
+            print("Percentual de Disco Usado:", lista[0][3], "%")
+
+        elif a == 4:
+            bytes = s.recv(10240)
+            lista = pickle.loads(bytes)
+
+            #10 caracteres + 1 de espaço
+            titulo = '{:11}'.format("Tamanho")
+
+            # Concatenar com 25 caracteres + 2 de espaços
+            titulo = titulo + '{:27}'.format("Data de Modificação")
+
+            # Concatenar com 25 caracteres + 2 de espaços
+            titulo = titulo + '{:27}'.format("Data de Criação")
+            titulo = titulo + "Nome"
+            print(titulo)
+
+            for i in lista:
+                kb = (lista[i][0]/1000)
+                tamanho = '{:10}'.format(str('{:.2f}'.format(kb)+' KB'))
+                print(tamanho, time.ctime(lista[i][2]), " ", time.ctime(lista[i][1]), " ", i)
 
 
         else:
