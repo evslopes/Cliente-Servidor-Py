@@ -57,6 +57,22 @@ def info_processos():
     return resposta
 
 def info_disco():
+    resposta = []
+    resposta.append(psutil.disk_usage('/'))
+
+    return resposta
+
+def info_diretorio():
+
+    resposta = {}
+    lista = os.listdir()
+
+    for i in lista:
+        if os.path.isfile(i):
+            resposta[i] = []
+            resposta[i].append(os.stat(i).st_size)
+            resposta[i].append(os.stat(i).st_atime)
+            resposta[i].append(os.stat(i).st_mtime)
 
     return resposta
 
