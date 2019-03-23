@@ -144,7 +144,15 @@ while True:
         else:
             erro_pid = "PID Inválido."
             socket_cliente.send(pickle.dumps(erro_pid))
-
+    
+    # REDE
+    elif menu == 6:
+        resposta = []
+        resposta.append(info_redes())
+        # Prepara a lista para o envio
+        bytes_resp = pickle.dumps(resposta)
+        # Envia os dados
+        socket_cliente.send(bytes_resp)
 
 # Fecha socket do servidor e cliente
 print("Fechando conexão...")
