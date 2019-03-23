@@ -34,12 +34,9 @@ def info_memoria():
     return resposta
 
 def info_redes():
-    resposta = []
 
-    dic_interfaces = psutil.net_if_addrs('lo')
-    texto = "Interface de rede: " + str(dic_interfaces) + "."
+    resposta = psutil.net_if_addrs()
 
-    resposta.append(texto)
     return resposta
 
 def info_processos():
