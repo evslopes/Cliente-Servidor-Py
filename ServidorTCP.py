@@ -34,13 +34,12 @@ def info_memoria():
     return resposta
 
 def info_redes():
-    
-    resposta = {"lo0": psutil.net_if_addrs()['lo0'],
-              }
+
+    resposta = psutil.net_if_addrs()
 
     return resposta
 
-
+    
 def info_processos():
     pids = psutil.pids()
     pids_nome = []
