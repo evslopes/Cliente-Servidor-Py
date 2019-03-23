@@ -80,6 +80,10 @@ try:
             print('Total: ', lista[0]['ram_total'], 'GB')
             print('Percentual:', lista[0]['ram_percentual'], '%')
 
+        elif a == 6:
+            bytes = s.recv(10240)
+            lista = pickle.loads(bytes)
+            print('\nInformações de interfaces de rede\n', list(lista))
 
         else:
 
