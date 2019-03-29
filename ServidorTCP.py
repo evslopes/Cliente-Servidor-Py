@@ -175,7 +175,7 @@ def obter_hostnames(host_validos):
     for i in host_validos:
         try:
             nm.scan(i)
-            print("O IP", host_validos[i], "possui o nome", nm[i].hostname())
+            print("O IP 10.10.",i, "possui o nome", nm[i].hostname())
         except:
             pass
 
@@ -188,7 +188,7 @@ apresentacao()
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Obtem o nome da máquina
 host = socket.gethostname()
-porta = 9999
+porta = 9998
 # Associa a porta
 socket_servidor.bind((host, porta))
 # Escutando...
@@ -200,7 +200,7 @@ print("\nServidor de nome", host, "esperando conexão na porta", porta)
 print("\nEstabelecebndo conexão...")
 print("\nConectado a:", str(addr))
 print("\n\nAguardando solicitação do cliente...\n")    
-    
+
 while True:
     
     try:
@@ -296,25 +296,31 @@ while True:
         elif menu == 7:
 
             inter_inicio(menu)
-            bytes_ip = socket_cliente.recv(10240)
+            #Recebe IP
+            bytes_ip = socket_cliente.recv(102400)
             ip = pickle.loads(bytes_ip)
-
-            host_validos = verifica_hosts(ip)
+            print("IP:",ip)
             
+            # valida os hosts
+            host_validos = verifica_hosts(ip)
+            print("\nHosts válidos; ", host_validos)
             # Prepara a lista para o envio
             bytes_resp = pickle.dumps(host_validos)
-            # Envia os dados
-            socket_cliente.send(bytes_resp)
-
+            # Envia os hosts válidos
+            socket_cliente.send(bytes_resp)    
+                
             obter_hostnames(host_validos)
 
             resposta = []
             resposta.append(host_validos)
 
+            print("\nResposta: ", resposta)
+
             # Prepara a lista para o envio
-            bytes_resp = pickle.dumps(resposta)
+            bytes_resp2 = pickle.dumps(resposta)
             # Envia os dados
-            socket_cliente.send(bytes_resp)   
+            socket_cliente.send(bytes_resp2)
+
             inter_fim()
     
     except Exception as erro:

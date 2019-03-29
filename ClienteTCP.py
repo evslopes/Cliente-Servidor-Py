@@ -36,7 +36,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
     # Tenta se conectar ao servidor
-    s.connect((socket.gethostname(), 9999))
+    s.connect((socket.gethostname(), 9998))
 
     # Loop do menu
     while(a != 0):
@@ -149,23 +149,24 @@ try:
         elif a == 7:
             
             print('\nInformações de host via nmap\n')
+            # Recebe IP
             ip_string = input("Digite o ip alvo: ")
             ip_lista = ip_string.split('.')
             base_ip = ".".join(ip_lista[0:3]) + '.'       
             print("O teste sera feito com a base: ", base_ip)
             
+            # Envia IP
             bytes_ip = pickle.dumps(base_ip)
             s.send(bytes_ip)
+
+            print("Mapping ready...")    
             
-            print("Mapeando\r")
-             
-            bytes = s.recv(10240)
+            # Recebe os hosts validos    
+            bytes = s.recv(102400)
             lista = pickle.loads(bytes)
-            print("\nMapping ready...")
-            for i in lista:        
-                print(lista[i])
-
-
+            print(bytes_ip)
+            print(lista)
+                
         else:
 
             # Converte os bytes para lista
