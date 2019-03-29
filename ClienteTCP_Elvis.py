@@ -85,7 +85,16 @@ try:
             lista = pickle.loads(bytes)
             print('\nInformações de interfaces de rede\n', list(lista))
             
-            
+
+        # REDE
+        elif menu == 6:
+            resposta = []
+            resposta.append(info_redes())
+            # Prepara a lista para o envio
+            bytes_resp = pickle.dumps(resposta)
+            # Envia os dados
+            socket_cliente.send(bytes_resp)
+
         else:
 
             # Converte os bytes para lista

@@ -1,26 +1,35 @@
-import socket
-import time
-import pickle
-import psutil
+#Nome dos alunos: Mayara Lima, Elvis Lopes, Antônio Castillo
 
-# Função que imprime a lista formatada
+import socket, time, pickle
 
+# Função do menu
+
+def apresentacao():
+    print("\n--------------------------------------------------------------------------------------" )
+    print("\tArquitetura de Computadores, Sistemas Operacionais e Redes" )
+    print("--------------------------------------------------------------------------------------" )
 
 def menu_cliente():
 
     print("\nDigite a seguinte tecla para ter informações do servidor:\n\n"
-          "\t [1]   Informação do Processador \n"
-          "\t [2]   Informação da Memória \n"
-          "\t [3]   Informação do Disco \n"
-          "\t [4]   Informação da CPU \n"
-          "\t [5]   Informação do Diretório \n"
-          "\t [FIM] Para sair \n"
+          "\t [1]   Informações do Processador \n"
+          "\t [2]   Informações da Memória \n"
+          "\t [3]   Informações do Disco \n"
+          "\t [4]   Informações do Diretório \n"
+          "\t [5]   Informações de Processo \n"
+          "\t [6]   Informações da Redea \n"
+          "\t [7]   Informações do Nmap \n"    
+          "\t [0]   Para sair \n"   
           )
 
+#____main___
+apresentacao()
 
-# ___main___
+# Execução da função do menu
 menu_cliente()
-a = input("Digite o número da informação que deseja saber: ")
+
+# Opção do menu escolhida
+a = int(input("Digite o número da informação que deseja saber: "))
 
 # Cria o socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -29,23 +38,146 @@ try:
     # Tenta se conectar ao servidor
     s.connect((socket.gethostname(), 9999))
 
-    # Loop
-    while(a != 'FIM'): 
-        msg = str(a)
-        print('{:>8}'.format('')+'{:>8}'.format(''))
-        for i in range(10):
-            # Envia mensagem vazia apenas para indicar a requisição
-            s.send(msg.encode('ascii'))
-            bytes = s.recv(6000)   
+    # Loop do menu
+    while(a != 0):
+
+        # Requisição da posição do menu
+        bytes_menu = pickle.dumps(a)
+        s.send(bytes_menu)
+
+        # Menu interno
+
+        # Processador
+        if a == 1:
+            # Converte os bytes para lista
+            bytes = s.recv(10240)
+            lista = pickle.loads(bytes)
+
+            print('\nInformações do processador:'
+                  '\n\nNome: ', lista[0]['cpu_nome'],
+                  '\nNº de núcleos lógicos: ', lista[0]['cpu_logico'],
+                  '\nNº de núcleos físicos: ', lista[0]['cpu_fisico'],
+                  '\nArquitetura: ', lista[0]['cpu_arq'],
+                  '\nBits: ', lista[0]['cpu_bits'],
+                  '\n\nFrequência atual: ', lista[0]['cpu_frequencia_atual'], '/ Frequência máxima: ', lista[0]['cpu_frequencia_max'],
+                  '\n\nPercentual de uso por núcleo: ', lista[0]['cpu_percentual_nucleo'], '/ Percentual de uso total: ', lista[0]['cpu_percentual'])
+        
+        # Memória
+        elif a == 2:
+            bytes = s.recv(10240)
+            lista = pickle.loads(bytes)
+            
+            print("\nInformações da memória:" )
+            print('Total: ', lista[0]['ram_total'], 'GB')
+            print('Em uso: ', lista[0]['ram_uso'], 'GB')
+            print('Percentual:', lista[0]['ram_percentual'], '%')
+
+        # Disco
+        elif a == 3:
+            bytes = s.recv(10240)
+            lista = pickle.loads(bytes)
+
+            print('\nInformações do disco:\n')
+            print("Total:", round(lista[0][0]/(1024*1024*1024), 2), "GB")
+            print("Em uso:", round(lista[0][1]/(1024*1024*1024), 2), "GB")
+            print("Livre:", round(lista[0][2]/(1024*1024*1024), 2), "GB")
+            print("Arquitetutra:", lista[1])
+
+            print("Percentual de Disco Usado:", lista[0][3], "%")
+
+        # Diretorio
+        elif a == 4:
+            bytes = s.recv(10240)
+            lista = pickle.loads(bytes)
+
+            print('\nInformações do diretório atual:\n')    
+
+            #10 caracteres + 1 de espaço
+            titulo = '{:11}'.format("Tamanho")
+
+            # Concatenar com 25 caracteres + 2 de espaços
+            titulo = titulo + '{:27}'.format("Data de Modificação")
+
+            # Concatenar com 25 caracteres + 2 de espaços
+            titulo = titulo + '{:27}'.format("Data de Criação")
+            titulo = titulo + "Nome"
+            print(titulo)
+
+            for i in lista:
+                kb = (lista[i][0]/1000)
+                tamanho = '{:10}'.format(str('{:.2f}'.format(kb)+' KB'))
+                print(tamanho, time.ctime(lista[i][2]), " ", time.ctime(lista[i][1]), " ", i)
+
+        # Processos
+        elif a == 5:
+            print('\nInformações de processos:', '\n')
 
             # Converte os bytes para lista
+            bytes = s.recv(10240)
             lista = pickle.loads(bytes)
-            print(lista)
-            time.sleep(2)
-        a = input("\nDigite o número da informação que deseja saber: ")
 
-    msg = 'fim'
-    s.send(msg.encode('ascii'))
+            print('{:^5}'.format("PIDs"), '{:^10}'.format("RAM em MB"), "Executavel")
+            for x in range(len(lista[0]['pids'])):
+                print("{:^5}".format(lista[0]['pids'][x]), "{:^10}".format(lista[0]['pids_memory'][x]), lista[0]['pids_nome'][x])
+
+            pid = int(input("\nDigite o PID: "))
+            bytes_menu = pickle.dumps(pid)
+            s.send(bytes_menu)
+            bytes_menu = s.recv(10240)
+
+
+            reposta2 = pickle.loads(bytes_menu)
+
+            if reposta2 == "PID Inválido.":
+                print("\nPID Inválido")
+            else:
+                print('\nNúcleos por PID: ', round(float(reposta2)/100))
+
+        elif a == 6:
+            bytes = s.recv(10240)
+            lista = pickle.loads(bytes)
+        
+            print('\nInformações de interfaces de rede\n')
+            for i in lista:
+                print("Interface "+ i)
+                for j in lista[i]:
+                    print(str(j))      
+                print("")
+
+        elif a == 7:
+            
+            ip_string = input("Entre com o ip alvo: ")
+            ip_lista = ip_string.split('.')
+            base_ip = ".".join(ip_lista[0:3]) + '.'
+            
+            print("O teste sera feito com a base: ", base_ip)
+            
+            bytes_ip = pickle.dumps(base_ip)
+            s.send(bytes_ip)
+            
+            bytes_ip = s.recv(10240)
+            print("Mapeando\r")
+
+                
+            bytes = s.recv(10240)
+            lista = pickle.loads(bytes)
+            print("\nMapping ready...")
+            for i in lista:        
+                print(lista[i])
+                
+
+
+        else:
+
+            # Converte os bytes para lista
+            bytes = s.recv(10240)
+            lista = pickle.loads(bytes)
+            print('\r', lista, end='')
+        
+        print("--------------------------------------------------------------------------------------\n" )
+
+        a = int(input("\nDigite o número da informação que deseja saber: "))
+                
 
 except Exception as erro:
     # Tratar esse erro criando uma funcao com o cógido acima

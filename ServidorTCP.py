@@ -1,50 +1,143 @@
-import socket
-import psutil
-import pickle
+#Nome dos alunos: Mayara Lima, Elvis Lopes, Antônio Castillo
 
-# Função para exibir uso do CPU
-def cpu():
-    resposta = ['Frequência atual: ', psutil.cpu_freq().current, 'Frequência max: ',  psutil.cpu_freq(
-    ).max, 'Porcentagem por CPU: ', psutil.cpu_percent(percpu=True), 'Porcentagem total: ', psutil.cpu_percent()]
-    return resposta
+import socket, psutil, pickle, cpuinfo, os, nmap, subprocess, platform
 
 
-# Função para verificar memoria total, em uso e porcentagem
-def uso_memoria():
-    resposta = []
+# Funções
+def info_cpu():
+
+  resposta = {"cpu_nome": cpuinfo.get_cpu_info()['brand'],
+              "cpu_arq": cpuinfo.get_cpu_info()['arch'],
+              "cpu_bits": cpuinfo.get_cpu_info()['bits'],
+              "cpu_logico": psutil.cpu_count(logical=True),
+              "cpu_fisico": psutil.cpu_count(logical=False),
+              "cpu_frequencia_atual": psutil.cpu_freq().current,
+              "cpu_frequencia_max":  psutil.cpu_freq().max,
+              "cpu_percentual_nucleo": psutil.cpu_percent(percpu=True),
+              "cpu_percentual": psutil.cpu_percent()
+              }
+
+  return resposta
+
+def info_memoria():
 
     # buscando memoria total
     mem = psutil.virtual_memory()
-    total = round(mem.total/(1024*1024*1024), 2)
-    texto_total = "Memória Total: " + str(total) + "GB"
+    total = round(mem.total/1024**3, 2)
 
     # buscando memoria em uso
-    mem_a = psutil.virtual_memory()
-    available = round(mem.available/(1024*1024*1024), 2)
-    texto_available = "Memória em uso: " + str(total - available) + "GB"
+    available = round(total-mem.available/1024**3, 2)
 
     # calculando porcentagem de uso
-    porcentagem = 100-((available/total)*100)
-    texto_porcentagem = "--- " + str(porcentagem) + "%"
+    porcentagem = round((available/total)*100,2)
 
-    resposta.append(texto_total + "  " + texto_available +
-                    "  " + texto_porcentagem)
+    resposta = {"ram_total": total,
+                "ram_uso": available,
+                "ram_percentual": porcentagem}
 
     return resposta
 
-
-# Função para coletar informações sobre a rede
 def info_redes():
+   
+    resposta = psutil.net_if_addrs()
+    return resposta
+
+# Definindo a plataforma 
+plataforma = platform.system()
+args = []
+if plataforma == "Windows":
+    args = ["ping", "-n", "1", "-l", "1", "-w", "100", 'www.google.com']
+
+else:
+    args = ['ping', '-c', '1', '-W', '1', 'www.google.com']
+
+ret_cod = subprocess.call(args,
+                        stdout=open(os.devnull, 'w'),
+                        stderr=open(os.devnull, 'w'))
+
+
+def retorna_codigo_ping(hostname):
+    """Usa o utilitario ping do sistema operacional para encontrar   o host. ('-c 5') indica, 
+        em sistemas linux, que deve mandar 5   pacotes. ('-W 3') indica, em sistemas linux, 
+            que deve esperar 3   milisegundos por uma resposta. Esta funcao retorna o codigo de   resposta do ping"""
     
-    interfaces = psutil.net_if_addrs()
-    resposta = []
+    plataforma = platform.system()
+    args = []
+    if plataforma == "Windows":
+        args = ["ping", "-n", "1", "-l", "1", "-w", "100", hostname]
 
-    resposta.append(str(interfaces))
+    else:
+        args = ['ping', '-c', '1', '-W', '1', hostname]
 
-    resposta = list(set(resposta))
+    ret_cod = subprocess.call(args,
+                                stdout=open(os.devnull, 'w'),
+                                stderr=open(os.devnull, 'w'))
+    return ret_cod
+
+
+def verifica_hosts(base_ip):
+    
+    host_validos = []
+    return_codes = dict()
+    for i in range(1, 255):
+
+        return_codes[base_ip +
+                     '{0}'.format(i)] = retorna_codigo_ping(base_ip + '{0}'.format(i))
+        if i % 20 == 0:
+            print(".", end="")
+        if return_codes[base_ip + '{0}'.format(i)] == 0:
+            host_validos.append(base_ip + '{0}'.format(i))
+
+    return host_validos
+
+def obter_hostnames(host_validos):
+    nm = nmap.PortScanner()
+    for i in host_validos:
+        try:
+            nm.scan(i)
+            print("O IP", '192.168.100.15', "possui o nome", nm[i].hostname())
+        except:
+            pass
+
+
+def info_processos():
+    pids = psutil.pids()
+    pids_nome = []
+    pids_cpu = []
+    pids_memory = []
+
+    for x in pids:
+        pids_nome.append(psutil.Process(x).name())
+        pids_memory.append(round(psutil.Process(x).memory_info().rss * 10 ** -6, 2))
+
+    resposta = {"pids": pids,
+                "pids_nome": pids_nome,
+                "pids_memory": pids_memory,
+                "pids_cpu": pids_cpu}
 
     return resposta
 
+def info_disco():
+    resposta = []
+    resposta.append(psutil.disk_usage('/'))
+    resposta.append(psutil.disk_partitions('/')[0][2])
+
+    return resposta
+
+def info_diretorio():
+
+    resposta = {}
+    lista = os.listdir()
+
+    for i in lista:
+        if os.path.isfile(i):
+            resposta[i] = []
+            resposta[i].append(os.stat(i).st_size)
+            resposta[i].append(os.stat(i).st_ctime)
+            resposta[i].append(os.stat(i).st_mtime)
+
+
+    return resposta
 
 # Cria o socket
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -57,50 +150,107 @@ socket_servidor.bind((host, porta))
 socket_servidor.listen()
 print("Servidor de nome", host, "esperando conexão na porta", porta)
 # Aceita alguma conexão
-(socket_cliente, addr) = socket_servidor.accept()
+(socket_cliente,addr) = socket_servidor.accept()
+
 print("Conectado a:", str(addr))
 
-# ___main___
-
 while True:
-    # Recebe pedido do cliente:
-    msg = socket_cliente.recv(1024)
-    if msg.decode('ascii') == 'fim':
+    # Recebimento da posição do menu
+    bytes_menu = socket_cliente.recv(10240)
+    menu = pickle.loads(bytes_menu)
+
+    # Fechar
+    if menu == 0:
         break
 
-    # Uso da memória
-    elif msg.decode('ascii') == '2':
-
-        # Prepara a lista para o envio
-        bytes_resp = pickle.dumps(uso_memoria())
+    # CPU
+    elif menu == 1:
+        resposta = []
+        resposta.append(info_cpu())
+        bytes_resp = pickle.dumps(resposta)
         # Envia os dados
         socket_cliente.send(bytes_resp)
 
-    elif msg.decode('ascii') == '3':
+    # RAM
+    elif menu == 2:
         resposta = []
-        resposta.append(psutil.disk_partitions())
-
+        resposta.append(info_memoria())
         # Prepara a lista para o envio
         bytes_resp = pickle.dumps(resposta)
         # Envia os dados
         socket_cliente.send(bytes_resp)
 
-    elif msg.decode('ascii') == '4':
-        resposta = []
-        resposta.append(cpu())
+    # DISCO
+    elif menu == 3:
+
         # Prepara a lista para o envio
-        bytes_resp = pickle.dumps(resposta)
+        bytes_resp = pickle.dumps(info_disco())
         # Envia os dados
         socket_cliente.send(bytes_resp)
 
-    # Uso da rede
-    elif msg.decode('ascii') == '5':
+    # DIRETORIO
+    elif menu == 4:
 
+        # Prepara a lista para o envio
+        bytes_resp = pickle.dumps(info_diretorio())
+        # Envia os dados
+        socket_cliente.send(bytes_resp)
+
+    # PROCESSOS
+    elif menu == 5:
+        # Cria a variavel de resposta
+        resposta = []
+
+        # Adiciona a função de processos ao array resposta
+        resposta.append(info_processos())
+
+        # Prepara a lista para o envio
+        bytes_resp = pickle.dumps(resposta)
+
+        # Envia os dados
+        socket_cliente.send(bytes_resp)
+
+        bytes_menu = socket_cliente.recv(10240)
+        pid = pickle.loads(bytes_menu)
+        check_pid = pid in resposta[0]["pids"]
+
+        if check_pid == True:
+            socket_cliente.send(pickle.dumps(psutil.Process(pid).cpu_percent(interval=1)))
+
+        else:
+            erro_pid = "PID Inválido."
+            socket_cliente.send(pickle.dumps(erro_pid))
+    
+    # REDE
+    elif menu == 6:
+        
         # Prepara a lista para o envio
         bytes_resp = pickle.dumps(info_redes())
         # Envia os dados
-        socket_cliente.send(bytes_resp)   
+        socket_cliente.send(bytes_resp)
 
+    # REDE
+    elif menu == 7:
+
+        bytes_ip = socket_cliente.recv(10240)
+        ip = pickle.loads(bytes_ip)
+
+        host_validos = verifica_hosts(ip)
+        
+        # Prepara a lista para o envio
+        bytes_resp = pickle.dumps(host_validos)
+        # Envia os dados
+        socket_cliente.send(bytes_resp)
+        
+        obter_hostnames(host_validos)
+
+        resposta = []
+        resposta.append(host_validos)
+
+        # Prepara a lista para o envio
+        bytes_resp = pickle.dumps(resposta)
+        # Envia os dados
+        socket_cliente.send(bytes_resp)   
 
 # Fecha socket do servidor e cliente
 print("Fechando conexão...")
