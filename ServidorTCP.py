@@ -4,6 +4,39 @@ import socket, psutil, pickle, cpuinfo, os, nmap, subprocess, platform
 
 
 # Funções
+
+def apresentacao():
+    print("\n--------------------------------------------------------------------------------------" )
+    print("\tArquitetura de Computadores, Sistemas Operacionais e Redes - Software Servidor" )
+    print("--------------------------------------------------------------------------------------" )
+
+# interecao servidor
+def inter_inicio(a):
+
+    print("--------------------------------------------------------------------------------------\n" )
+    print("Conectado a:", str(addr))
+    print("\nRecebendo solicitação do cliente...")    
+    if (a==1):
+      print("\nColetando Informações do Processador...")  
+    elif (a==2):
+      print("\nColentando Informações da Memória...")  
+    elif (a==3):
+      print("\nColentando Informações do Disco...")  
+    elif (a==4):
+      print("\nColentando Informações do Diretório...")  
+    elif (a==5):
+      print("\nColentando Informações de Processo...")  
+    elif (a==6):
+      print("\nColentando Informações da Rede...")  
+    elif (a==7):
+      print("\nColentando Informações de Host...")   
+
+def inter_fim():
+
+    print("\nTodos os dados enviados do cliente...\n")
+    print("--------------------------------------------------------------------------------------\n" )           
+
+# CPU
 def info_cpu():
 
   resposta = {"cpu_nome": cpuinfo.get_cpu_info()['brand'],
@@ -19,6 +52,7 @@ def info_cpu():
 
   return resposta
 
+# Memória
 def info_memoria():
 
     # buscando memoria total
@@ -37,10 +71,56 @@ def info_memoria():
 
     return resposta
 
+# Disco
+def info_disco():
+    resposta = []
+    resposta.append(psutil.disk_usage('/'))
+    resposta.append(psutil.disk_partitions('/')[0][2])
+
+    return resposta
+
+# Diretorio
+def info_diretorio():
+
+    resposta = {}
+    lista = os.listdir()
+
+    for i in lista:
+        if os.path.isfile(i):
+            resposta[i] = []
+            resposta[i].append(os.stat(i).st_size)
+            resposta[i].append(os.stat(i).st_ctime)
+            resposta[i].append(os.stat(i).st_mtime)
+
+
+    return resposta
+
+# Processos
+def info_processos():
+    pids = psutil.pids()
+    pids_nome = []
+    pids_cpu = []
+    pids_memory = []
+
+    for x in pids:
+        pids_nome.append(psutil.Process(x).name())
+        pids_memory.append(round(psutil.Process(x).memory_info().rss * 10 ** -6, 2))
+
+    resposta = {"pids": pids,
+                "pids_nome": pids_nome,
+                "pids_memory": pids_memory,
+                "pids_cpu": pids_cpu}
+
+    return resposta
+
+# Interfaces
 def info_redes():
    
     resposta = psutil.net_if_addrs()
     return resposta
+
+
+# Nmap
 
 # Definindo a plataforma 
 plataforma = platform.system()
@@ -95,49 +175,14 @@ def obter_hostnames(host_validos):
     for i in host_validos:
         try:
             nm.scan(i)
-            print("O IP", '192.168.100.15', "possui o nome", nm[i].hostname())
+            print("O IP", host_validos[i], "possui o nome", nm[i].hostname())
         except:
             pass
 
 
-def info_processos():
-    pids = psutil.pids()
-    pids_nome = []
-    pids_cpu = []
-    pids_memory = []
+# ___main___
 
-    for x in pids:
-        pids_nome.append(psutil.Process(x).name())
-        pids_memory.append(round(psutil.Process(x).memory_info().rss * 10 ** -6, 2))
-
-    resposta = {"pids": pids,
-                "pids_nome": pids_nome,
-                "pids_memory": pids_memory,
-                "pids_cpu": pids_cpu}
-
-    return resposta
-
-def info_disco():
-    resposta = []
-    resposta.append(psutil.disk_usage('/'))
-    resposta.append(psutil.disk_partitions('/')[0][2])
-
-    return resposta
-
-def info_diretorio():
-
-    resposta = {}
-    lista = os.listdir()
-
-    for i in lista:
-        if os.path.isfile(i):
-            resposta[i] = []
-            resposta[i].append(os.stat(i).st_size)
-            resposta[i].append(os.stat(i).st_ctime)
-            resposta[i].append(os.stat(i).st_mtime)
-
-
-    return resposta
+apresentacao()
 
 # Cria o socket
 socket_servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -148,112 +193,138 @@ porta = 9999
 socket_servidor.bind((host, porta))
 # Escutando...
 socket_servidor.listen()
-print("Servidor de nome", host, "esperando conexão na porta", porta)
+print("\nServidor de nome", host, "esperando conexão na porta", porta)
 # Aceita alguma conexão
 (socket_cliente,addr) = socket_servidor.accept()
 
-print("Conectado a:", str(addr))
-
-while True:
-    # Recebimento da posição do menu
-    bytes_menu = socket_cliente.recv(10240)
-    menu = pickle.loads(bytes_menu)
-
-    # Fechar
-    if menu == 0:
-        break
-
-    # CPU
-    elif menu == 1:
-        resposta = []
-        resposta.append(info_cpu())
-        bytes_resp = pickle.dumps(resposta)
-        # Envia os dados
-        socket_cliente.send(bytes_resp)
-
-    # RAM
-    elif menu == 2:
-        resposta = []
-        resposta.append(info_memoria())
-        # Prepara a lista para o envio
-        bytes_resp = pickle.dumps(resposta)
-        # Envia os dados
-        socket_cliente.send(bytes_resp)
-
-    # DISCO
-    elif menu == 3:
-
-        # Prepara a lista para o envio
-        bytes_resp = pickle.dumps(info_disco())
-        # Envia os dados
-        socket_cliente.send(bytes_resp)
-
-    # DIRETORIO
-    elif menu == 4:
-
-        # Prepara a lista para o envio
-        bytes_resp = pickle.dumps(info_diretorio())
-        # Envia os dados
-        socket_cliente.send(bytes_resp)
-
-    # PROCESSOS
-    elif menu == 5:
-        # Cria a variavel de resposta
-        resposta = []
-
-        # Adiciona a função de processos ao array resposta
-        resposta.append(info_processos())
-
-        # Prepara a lista para o envio
-        bytes_resp = pickle.dumps(resposta)
-
-        # Envia os dados
-        socket_cliente.send(bytes_resp)
-
-        bytes_menu = socket_cliente.recv(10240)
-        pid = pickle.loads(bytes_menu)
-        check_pid = pid in resposta[0]["pids"]
-
-        if check_pid == True:
-            socket_cliente.send(pickle.dumps(psutil.Process(pid).cpu_percent(interval=1)))
-
-        else:
-            erro_pid = "PID Inválido."
-            socket_cliente.send(pickle.dumps(erro_pid))
+print("\nEstabelecebndo conexão...")
+print("\nConectado a:", str(addr))
+print("\n\nAguardando solicitação do cliente...\n")    
     
-    # REDE
-    elif menu == 6:
-        
-        # Prepara a lista para o envio
-        bytes_resp = pickle.dumps(info_redes())
-        # Envia os dados
-        socket_cliente.send(bytes_resp)
+while True:
+    
+    try:
+        # Recebimento da posição do menu
+        bytes_menu = socket_cliente.recv(10240)
+        menu = pickle.loads(bytes_menu)
 
-    # REDE
-    elif menu == 7:
+        # Fechar
+        if menu == 0:
+            print("\nFechando conexão...")
+            break
 
-        bytes_ip = socket_cliente.recv(10240)
-        ip = pickle.loads(bytes_ip)
+        # CPU
+        elif menu == 1:
+            inter_inicio(menu)
+            resposta = []
+            resposta.append(info_cpu())
+            bytes_resp = pickle.dumps(resposta)
+            # Envia os dados
+            socket_cliente.send(bytes_resp)
+            inter_fim()
 
-        host_validos = verifica_hosts(ip)
-        
-        # Prepara a lista para o envio
-        bytes_resp = pickle.dumps(host_validos)
-        # Envia os dados
-        socket_cliente.send(bytes_resp)
-        
-        obter_hostnames(host_validos)
+        # RAM
+        elif menu == 2:
+            inter_inicio(menu)
+            resposta = []
+            resposta.append(info_memoria())
+            # Prepara a lista para o envio
+            bytes_resp = pickle.dumps(resposta)
+            # Envia os dados
+            socket_cliente.send(bytes_resp)
+            inter_fim()
 
-        resposta = []
-        resposta.append(host_validos)
+        # DISCO
+        elif menu == 3:
+            inter_inicio(menu)
+            # Prepara a lista para o envio
+            bytes_resp = pickle.dumps(info_disco())
+            # Envia os dados
+            socket_cliente.send(bytes_resp)
+            inter_fim()
 
-        # Prepara a lista para o envio
-        bytes_resp = pickle.dumps(resposta)
-        # Envia os dados
-        socket_cliente.send(bytes_resp)   
+        # DIRETORIO
+        elif menu == 4:
+
+            inter_inicio(menu)
+            # Prepara a lista para o envio
+            bytes_resp = pickle.dumps(info_diretorio())
+            # Envia os dados
+            socket_cliente.send(bytes_resp)
+            inter_fim()
+
+        # PROCESSOS
+        elif menu == 5:
+
+            inter_inicio(menu)
+            # Cria a variavel de resposta
+            resposta = []
+
+            # Adiciona a função de processos ao array resposta
+            resposta.append(info_processos())
+
+            # Prepara a lista para o envio
+            bytes_resp = pickle.dumps(resposta)
+
+            # Envia os dados
+            socket_cliente.send(bytes_resp)
+
+            bytes_menu = socket_cliente.recv(10240)
+            pid = pickle.loads(bytes_menu)
+            check_pid = pid in resposta[0]["pids"]
+
+            if check_pid == True:
+                socket_cliente.send(pickle.dumps(psutil.Process(pid).cpu_percent(interval=1)))
+
+            else:
+                erro_pid = "PID Inválido."
+                socket_cliente.send(pickle.dumps(erro_pid))
+
+            inter_fim()
+
+        # Interfaces
+        elif menu == 6:
+            
+            inter_inicio(menu)
+            # Prepara a lista para o envio
+            bytes_resp = pickle.dumps(info_redes())
+            # Envia os dados
+            socket_cliente.send(bytes_resp)
+            inter_fim()
+
+        # Hosts
+        elif menu == 7:
+
+            inter_inicio(menu)
+            bytes_ip = socket_cliente.recv(10240)
+            ip = pickle.loads(bytes_ip)
+
+            host_validos = verifica_hosts(ip)
+            
+            # Prepara a lista para o envio
+            bytes_resp = pickle.dumps(host_validos)
+            # Envia os dados
+            socket_cliente.send(bytes_resp)
+
+            obter_hostnames(host_validos)
+
+            resposta = []
+            resposta.append(host_validos)
+
+            # Prepara a lista para o envio
+            bytes_resp = pickle.dumps(resposta)
+            # Envia os dados
+            socket_cliente.send(bytes_resp)   
+            inter_fim()
+    
+    except Exception as erro:
+        print("")
+        break    
+
 
 # Fecha socket do servidor e cliente
-print("Fechando conexão...")
+print("Fechando conexão...\n")
 socket_cliente.close()
+print("Conexão encerrada.")
 socket_servidor.close()
-print("Aplicação finalizada.")
+print("Aplicação finalizada.\n")

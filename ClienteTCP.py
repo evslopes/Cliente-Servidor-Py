@@ -6,7 +6,7 @@ import socket, time, pickle
 
 def apresentacao():
     print("\n--------------------------------------------------------------------------------------" )
-    print("\tArquitetura de Computadores, Sistemas Operacionais e Redes" )
+    print("\tArquitetura de Computadores, Sistemas Operacionais e Redes - Software Cliente" )
     print("--------------------------------------------------------------------------------------" )
 
 def menu_cliente():
@@ -17,8 +17,8 @@ def menu_cliente():
           "\t [3]   Informações do Disco \n"
           "\t [4]   Informações do Diretório \n"
           "\t [5]   Informações de Processo \n"
-          "\t [6]   Informações da Redea \n"
-          "\t [7]   Informações do Nmap \n"    
+          "\t [6]   Informações da Redes \n"
+          "\t [7]   Informações via Nmap \n"    
           "\t [0]   Para sair \n"   
           )
 
@@ -128,11 +128,12 @@ try:
 
             reposta2 = pickle.loads(bytes_menu)
 
-            if reposta2 == "PID Inválido.":
+            if reposta2 == "PID Inválido":
                 print("\nPID Inválido")
             else:
                 print('\nNúcleos por PID: ', round(float(reposta2)/100))
 
+        # Rede            
         elif a == 6:
             bytes = s.recv(10240)
             lista = pickle.loads(bytes)
@@ -144,27 +145,25 @@ try:
                     print(str(j))      
                 print("")
 
+        # Rede
         elif a == 7:
             
-            ip_string = input("Entre com o ip alvo: ")
+            print('\nInformações de host via nmap\n')
+            ip_string = input("Digite o ip alvo: ")
             ip_lista = ip_string.split('.')
-            base_ip = ".".join(ip_lista[0:3]) + '.'
-            
+            base_ip = ".".join(ip_lista[0:3]) + '.'       
             print("O teste sera feito com a base: ", base_ip)
             
             bytes_ip = pickle.dumps(base_ip)
             s.send(bytes_ip)
             
-            bytes_ip = s.recv(10240)
             print("Mapeando\r")
-
-                
+             
             bytes = s.recv(10240)
             lista = pickle.loads(bytes)
             print("\nMapping ready...")
             for i in lista:        
                 print(lista[i])
-                
 
 
         else:
@@ -175,7 +174,6 @@ try:
             print('\r', lista, end='')
         
         print("--------------------------------------------------------------------------------------\n" )
-
         a = int(input("\nDigite o número da informação que deseja saber: "))
                 
 
